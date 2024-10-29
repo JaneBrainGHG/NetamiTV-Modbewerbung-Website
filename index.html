@@ -1,0 +1,176 @@
+<<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewerbung für Moderator-Position</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #8EC5FC, #E0C3FC);
+            color: #333;
+        }
+        .bewerbungsformular {
+            width: 400px;
+            padding: 25px;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            text-align: center;
+        }
+        .bewerbungsformular h2 {
+            color: #5c85d6;
+            margin-bottom: 20px;
+        }
+        .inputfeld {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+            transition: background-color 0.2s ease;
+        }
+        .inputfeld:focus {
+            background: #e0f2ff;
+            outline: none;
+        }
+        .button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #5c85d6, #4e79d4);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease;
+        }
+        .warnung {
+            color: #ff4d4d;
+            text-align: center;
+            font-weight: bold;
+        }
+        .support-buttons {
+            margin-top: 20px;
+        }
+        .support-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #4caf50; /* Grün für Discord Server */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .support-button:hover {
+            background-color: #45a049; /* Dunkleres Grün bei Hover */
+        }
+    </style>
+</head>
+<body>
+
+<div class="bewerbungsformular" id="bewerbungsformular">
+    <h2>Bewerbung für Moderator</h2>
+    <p id="warnung" class="warnung" style="display: none;">⚠️ Du hast bereits eine Bewerbung eingereicht.</p>
+
+    <form id="bewerbungsForm">
+        <input type="text" id="name" class="inputfeld" placeholder="Name" required>
+        <input type="email" id="email" class="inputfeld" placeholder="E-Mail" required>
+
+        <label for="position" style="font-weight:bold; display:block; margin-top: 15px;">Position:</label>
+        <select id="position" class="inputfeld" required>
+            <option value="">Bitte Position wählen</option>
+            <option value="Twitch Moderator">Twitch Moderator</option>
+            <option value="Discord Moderator">Discord Moderator</option>
+        </select>
+
+        <input type="text" id="tagField" class="inputfeld" placeholder="Twitch-Benutzername oder Discord-Tag" required>
+        <textarea id="nachricht" class="inputfeld" placeholder="Warum möchtest du diese Position?" rows="4" required></textarea>
+        <button type="button" class="button" onclick="sendeBewerbung()">Bewerbung absenden</button>
+    </form>
+
+    <div id="supportButtons" class="support-buttons">
+        <a href="https://discord.gg/3N4cas3vJz" class="support-button">Discord Server</a>
+        <a href="https://discordapp.com/users/zen2accdc" class="support-button">Kontakt: zen2accdc</a>
+    </div>
+</div>
+
+<script>
+// Überprüfen, ob die Bewerbung bereits gesendet wurde
+if (localStorage.getItem('bewerbungGesendet')) {
+    document.getElementById("bewerbungsForm").style.display = "none";
+    document.getElementById("warnung").style.display = "block"; // Warnung anzeigen
+}
+
+// Funktion um die Bewerbung abzusenden
+function sendeBewerbung() {
+    // Überprüfen, ob die Bewerbung bereits gesendet wurde
+    if (localStorage.getItem('bewerbungGesendet')) {
+        document.getElementById("warnung").style.display = "block"; // Warnung anzeigen
+        return; // Abbrechen, wenn bereits gesendet
+    }
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const position = document.getElementById("position").value;
+    const tagField = document.getElementById("tagField").value;
+    const nachricht = document.getElementById("nachricht").value;
+
+    // Simulieren das Senden der Daten an den Discord Webhook
+    fetch("https://discord.com/api/webhooks/1300818449005805721/JGZ3M34O05sL2NmcLX3PQozbgzMYUvjVRCHjl_Bjj8EKA4jgCZF8hkcSftEy5_AiAJHN", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            embeds: [{
+                title: "Neue Moderator Bewerbung",
+                color: 7506394,
+                fields: [
+                    { name: "Name", value: name, inline: true },
+                    { name: "E-Mail", value: email, inline: true },
+                    { name: "Position", value: position, inline: false },
+                    { name: position === "Twitch Moderator" ? "Twitch-Benutzername" : "Discord-Tag", value: tagField, inline: false },
+                    { name: "Nachricht", value: nachricht, inline: false }
+                ]
+            }]
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            localStorage.setItem('bewerbungGesendet', 'true'); // Status in localStorage speichern
+            alert("Bewerbung erfolgreich abgeschickt!");
+            document.getElementById("bewerbungsForm").reset(); // Formular zurücksetzen
+            document.getElementById("bewerbungsForm").style.display = "none"; // Formular ausblenden
+            document.getElementById("warnung").style.display = "block"; // Warnung anzeigen
+        } else {
+            alert("Fehler beim Senden der Bewerbung.");
+        }
+    })
+    .catch(error => {
+        console.error("Fehler beim Senden der Bewerbung:", error);
+        alert("Fehler beim Senden der Bewerbung.");
+    });
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
